@@ -26,7 +26,7 @@
 	<script>
 		// 建構子 ScoreOutputer 接受一個字串，該字串為 csv 的檔案名稱
 		// 以下面範例，檔名就為 "109598105(總分: 6).csv"
-		var so = new ScoreOutputer("109598105");
+		var so = new ScoreOutputer("109598050");
 		so.installCSS(function () {
 			// 安裝 bootstrap 的 css，如果在 html 上方引用 bootstrap 5.1.1 的話就不用使用 installCSS ，注意一定要 bootstrap css 5.1.1 版
 			// installCSS 接收一個 callback 當作參數，作為成功安裝 bootstrap css 的回呼函式
@@ -38,8 +38,8 @@
 			//有幾個項目就呼叫幾個 addChild
 			//addChild 要比 renderModal 先呼叫
 			so.addChild("繪製出 5 個畫面", 1, true);
-			so.addChild("回答問題", 1, false);
-			so.addChild("可按鍵選擇上 / 下一隻角色", 1, false);
+			so.addChild("回答問題", 1, true);
+			so.addChild("可按鍵選擇上 / 下一隻角色", 1, true);
 			so.addChild("讀取作業 2 儲存的座標點在眼睛上繪製出分割線", 1, false);
 			so.addChild("可選擇當下控制哪個虹膜", 1, false);
 			so.addChild("按滑鼠左鍵控制虹膜移動，右鍵停止", 2, false);
@@ -93,6 +93,12 @@
 
 		let modelState = 1;
 		let inputkey;
+
+		let modelFile = [
+			'models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx',
+			'models/mmd/kizunaai/kizunaai.pmx',
+            'models/mmd/『天宮こころ(Kokoro Amamiya)』/『天宮こころ(Kokoro Amamiya)』.pmx'
+		];
 
 		Ammo().then(function (AmmoLib) {
 
@@ -149,17 +155,20 @@
 
 			}
 
-			const modelFile = 'models/mmd/kizunaai/kizunaai.pmx';
+			//const modelFile = 'models/mmd/kizunaai/kizunaai.pmx';
 
 			helper = new MMDAnimationHelper();
 
 			const loader = new MMDLoader();
 
-			loader.load(modelFile, function (object) {
+			loader.load(modelFile[modelState], function (object) {
 
 				mesh = object;
-				mesh.position.y = - 100;
+				mesh.position.y = - 85;
 				mesh.scale.set(5, 5, 1);
+				mesh.name = "mesh";
+
+				console.log(mesh);
 
 				scene.add(mesh);
 
@@ -250,17 +259,17 @@
                 if(modelState == 0)
 				{
 					modelState = 2;
-					//loadertest();
+					loadertest();
 				}  
 				else if(modelState == 1)
 				{
 					modelState = 0;
-					//loadertest();
+					loadertest();
 				}
 				else if(modelState == 2)
 				{
 					modelState = 1;
-					//loadertest();
+					loadertest();
 				}  
 			}
 			if (event.keyCode == 68) {
@@ -269,20 +278,48 @@
 				if(modelState == 0)
 				{
                     modelState = 1;
-					//loadertest();
+					loadertest();
 				}    
 				else if(modelState == 1)
 				{
                     modelState = 2;
-					//loadertest();
+					loadertest();
 				}     	    
 				else if(modelState == 2)
 				{
                     modelState = 0;
-					//loadertest();
+					loadertest();
 				}	     	    
 			}
 		}
+
+		function loadertest() {
+			const loader = new MMDLoader();
+
+            loader.load(modelFile[modelState], function (object) {
+
+	            mesh = object;
+	            mesh.position.y = - 85;
+	            mesh.scale.set(5, 5, 1);
+			    mesh.name = "mesh";
+		        scene.remove( scene.getObjectByName("mesh"));
+
+	            scene.add(mesh);
+				console.log(mesh);
+
+            }, onProgress, null);
+		}
+
+		function onProgress(xhr) {
+
+            if (xhr.lengthComputable) {
+
+	            const percentComplete = xhr.loaded / xhr.total * 100;
+	            console.log(Math.round(percentComplete, 2) + '% downloaded');
+
+            }
+
+        }
 
 		function animate() {
 
