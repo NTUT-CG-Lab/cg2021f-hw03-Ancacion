@@ -93,6 +93,18 @@
 
 		let modelState = 1;
 		let inputkey;
+		var dataUrl;
+		var linesInfro = {
+			location:"",
+            line_locationx_1:0,
+            line_locationy_1:0,
+            line_locationx_2:0,
+            line_locationy_2:0,
+            line_locationx_3:0,
+            line_locationy_3:0,
+            line_locationx_4:0,
+            line_locationy_4:0
+		};  //把1234的線座標存起來
 
 		let modelFile = [
 			'models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx',
@@ -110,6 +122,15 @@
 		});
 
 		function init() {
+
+			dataUrl= "./json/kizunaai_modelData.json";
+            var xhr = new XMLHttpRequest()
+            xhr.open('GET',dataUrl, true)
+            xhr.send()
+			xhr.onload = function(){
+  			    var dataset = JSON.parse(this.responseText);
+    		    console.log(dataset);
+			}
 
 			const container = document.createElement('div');
 			document.body.appendChild(container);
@@ -259,17 +280,17 @@
                 if(modelState == 0)
 				{
 					modelState = 2;
-					loadertest();
+					modelLoader();
 				}  
 				else if(modelState == 1)
 				{
 					modelState = 0;
-					loadertest();
+					modelLoader();
 				}
 				else if(modelState == 2)
 				{
 					modelState = 1;
-					loadertest();
+					modelLoader();
 				}  
 			}
 			if (event.keyCode == 68) {
@@ -278,22 +299,22 @@
 				if(modelState == 0)
 				{
                     modelState = 1;
-					loadertest();
+					modelLoader();
 				}    
 				else if(modelState == 1)
 				{
                     modelState = 2;
-					loadertest();
+					modelLoader();
 				}     	    
 				else if(modelState == 2)
 				{
                     modelState = 0;
-					loadertest();
+					modelLoader();
 				}	     	    
 			}
 		}
 
-		function loadertest() {
+		function modelLoader() {
 			const loader = new MMDLoader();
 
             loader.load(modelFile[modelState], function (object) {
@@ -308,6 +329,8 @@
 				console.log(mesh);
 
             }, onProgress, null);
+
+			drawInitLine();
 		}
 
 		function onProgress(xhr) {
@@ -320,6 +343,25 @@
             }
 
         }
+
+		function drawInitLine() {
+			if(modelState == 0) {
+				dataUrl= "./json/物述有栖_modelData.json";
+			}
+			else if(modelState == 1) {
+				dataUrl= "./json/kizunaai_modelData.json";
+			}
+			else if(modelState == 2){
+				dataUrl= "./json/天宮こころ_modelData.json";
+			}
+            var xhr = new XMLHttpRequest()
+            xhr.open('GET',dataUrl, true)
+            xhr.send()
+			xhr.onload = function(){
+  			    var dataset = JSON.parse(this.responseText);
+    		    console.log(dataset);
+			}
+		}
 
 		function animate() {
 
