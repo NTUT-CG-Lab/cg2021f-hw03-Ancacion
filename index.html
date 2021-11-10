@@ -88,7 +88,7 @@
 		let SCREEN_WIDTH = window.innerWidth;
 		let SCREEN_HEIGHT = window.innerHeight;
 		let aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-		let frustumSize = 30;
+		let frustumSize = 8;
 		let camera, camera2, camera3, camera4, camera5;
 
 		let modelState = 1;
@@ -140,10 +140,16 @@
 			camera3 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
 			camera4 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
 			camera5 = new THREE.OrthographicCamera(0.25 * frustumSize * aspect / - 2, 0.25 * frustumSize * aspect / 2, 0.5 * frustumSize / 2, 0.5 * frustumSize / - 2, 0.1, 1000);
+			camera.position.x = 1;
+			camera.position.y = 8;
 			camera.position.z = 30;
+			camera2.position.y = 8;
 			camera2.position.z = 30;
+			camera3.position.y = 8;
 			camera3.position.z = 30;
+			camera4.position.y = 8;
 			camera4.position.z = 30;
+			camera5.position.y = 8;
 			camera5.position.z = 30;
 
 			// scene
