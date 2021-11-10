@@ -123,14 +123,15 @@
 
 		function init() {
 
-			dataUrl= "./json/kizunaai_modelData.json";
+			/*dataUrl= "./json/kizunaai_modelData.json";
             var xhr = new XMLHttpRequest()
             xhr.open('GET',dataUrl, true)
             xhr.send()
 			xhr.onload = function(){
   			    var dataset = JSON.parse(this.responseText);
     		    console.log(dataset);
-			}
+			}*/
+			drawInitLine();
 
 			const container = document.createElement('div');
 			document.body.appendChild(container);
@@ -360,7 +361,88 @@
 			xhr.onload = function(){
   			    var dataset = JSON.parse(this.responseText);
     		    console.log(dataset);
+
+		        console.log(dataset.line_locationx_1);
+				linesInfro.line_locationx_1 = dataset.line_locationx_1;
+				linesInfro.line_locationy_1 = dataset.line_locationy_1;
+				linesInfro.line_locationx_2 = dataset.line_locationx_2;
+				linesInfro.line_locationy_2 = dataset.line_locationy_2;
+				linesInfro.line_locationx_3 = dataset.line_locationx_3;
+				linesInfro.line_locationy_3 = dataset.line_locationy_3;
+				linesInfro.line_locationx_4 = dataset.line_locationx_4;
+				linesInfro.line_locationy_4 = dataset.line_locationy_4;
+				linesInfro.location = dataset.location;
+
+				console.log(linesInfro);
+
+				for(var i = 0; i < 4; i++)
+				{
+					switch(i) {
+						case 0:
+						    drawRed(linesInfro.line_locationx_1, linesInfro.line_locationy_1, i + 1);
+							break;
+						case 1:
+						    drawGreen(linesInfro.line_locationx_2, linesInfro.line_locationy_2, i + 1);
+							break;
+						case 2:
+						    drawRed(linesInfro.line_locationx_3, linesInfro.line_locationy_3, i + 1);
+							break;
+						case 3:
+						    drawGreen(linesInfro.line_locationx_4, linesInfro.line_locationy_4, i + 1);
+							break;
+					}
+				}
+				//drawRed(linesInfro.line_locationx_1, linesInfro.line_locationy_1);
+				//drawGreen(linesInfro.line_locationx_2, linesInfro.line_locationy_2);
+				//drawRed(linesInfro.line_locationx_3, linesInfro.line_locationy_3);
+				//drawGreen(linesInfro.line_locationx_4, linesInfro.line_locationy_4);
 			}
+		}
+
+		function drawRed(line_locationx, line_locationy, num) {
+			let material = new THREE.LineBasicMaterial( { color: 0xff0000 } );  //紅色
+			let points = [];
+            points.push( new THREE.Vector3( line_locationx - 1, line_locationy, 20 ) );
+            points.push( new THREE.Vector3( line_locationx + 1, line_locationy, 20 ) );
+
+            let geometry = new THREE.BufferGeometry().setFromPoints( points );
+			let line = new THREE.Line( geometry, material );
+            
+			if(num == 1) {
+				line.name = "redLine1";
+			    scene.remove( scene.getObjectByName("redLine1"));
+				console.log('1');
+			}
+			else {
+				line.name = "redLine3";
+			    scene.remove( scene.getObjectByName("redLine3"));
+				console.log('3');
+			}
+			
+			scene.add(line);
+		}
+
+		function drawGreen(line_locationx, line_locationy, num) {
+			let material = new THREE.LineBasicMaterial( { color: 0x00ff00 } );  //綠色
+			let points = [];
+            points.push( new THREE.Vector3( line_locationx, line_locationy - 1, 20 ) );
+            points.push( new THREE.Vector3( line_locationx, line_locationy + 1, 20 ) );
+
+            let geometry = new THREE.BufferGeometry().setFromPoints( points );
+			let line = new THREE.Line( geometry, material );
+			
+			if(num == 2) {
+				line.name = "greenLine2";
+			    scene.remove( scene.getObjectByName("greenLine2"));
+				console.log('2');
+			}
+			else {
+				line.name = "greenLine4";
+			    scene.remove( scene.getObjectByName("greenLine4"));
+				console.log('4');
+			}
+
+			scene.add(line);
 		}
 
 		function animate() {
