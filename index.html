@@ -107,6 +107,7 @@
             line_locationx_4:0,
             line_locationy_4:0
 		};  //把1234的線座標存起來
+		var mouseWorld = new THREE.Vector3();
 
 		let modelFile = [
 			'models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx',
@@ -123,6 +124,9 @@
 
 		});
 
+		var body = document.body;       
+		document.body.addEventListener('mousemove', getPosition, false);
+
 		function init() {
 
 			/*dataUrl= "./json/kizunaai_modelData.json";
@@ -133,7 +137,6 @@
   			    var dataset = JSON.parse(this.responseText);
     		    console.log(dataset);
 			}*/
-			drawInitLine();
 
 			const container = document.createElement('div');
 			document.body.appendChild(container);
@@ -182,7 +185,7 @@
 					console.log(Math.round(percentComplete, 2) + '% downloaded');
 
 				}
-
+                drawInitLine();
 			}
 
 			//const modelFile = 'models/mmd/kizunaai/kizunaai.pmx';
@@ -198,12 +201,13 @@
 				mesh.scale.set(1, 1, 1);
 				mesh.name = "mesh";
 
-				console.log(mesh);
+				//console.log(mesh);
 
 				scene.add(mesh);
 
 			}, onProgress, null);
 
+			//
 			//
 
 			window.addEventListener('resize', onWindowResize);
@@ -259,6 +263,7 @@
 			if (event.keyCode == 49) {
                 console.log('you click 1!');
 			    inputkey = 1;
+				testMouseControl();
 			}
 			if (event.keyCode == 50) {
                 console.log('you click 2!');
@@ -346,7 +351,7 @@
 		        scene.remove( scene.getObjectByName("mesh"));
 
 	            scene.add(mesh);
-				console.log(mesh);
+				//console.log(mesh);
 
             }, onProgress, null);
 
@@ -404,7 +409,7 @@
             xhr.send()
 			xhr.onload = function(){
   			    var dataset = JSON.parse(this.responseText);
-    		    console.log(dataset);
+    		    //console.log(dataset);
 
 		        console.log(dataset.line_locationx_1);
 				linesInfro.line_locationx_1 = dataset.line_locationx_1;
@@ -417,7 +422,7 @@
 				linesInfro.line_locationy_4 = dataset.line_locationy_4;
 				linesInfro.location = dataset.location;
 
-				console.log(linesInfro);
+				//console.log(linesInfro);
 
 				for(var i = 0; i < 4; i++)
 				{
@@ -545,6 +550,51 @@
 			}*/
 
 			scene.add(line);
+		}
+
+		function getPosition(e) {    //讀取滑鼠座標位置
+            const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+            mouseWorld.set(
+                ((e.clientX - left + 1) / width) * 2 - 1,
+                -((e.clientY - top + 1) / height) * 2 + 1,
+                (camera.near + camera.far) / (camera.near - camera.far),
+            );
+            //console.log(mouseWorld);  //在console內觀看結果
+			/*document.onclick = function () {  //點擊後
+                console.log('clicked!');
+				console.log(mouseWorld);
+				//console.log(scene.children[6]);
+				console.log(scene.children[6].geometry);
+				scene.children[6].geometry.bones[86].pos[0] = mouseWorld.x;
+				scene.children[6].geometry.bones[86].pos[1] = mouseWorld.y;
+				scene.children[6].geometry.bones[86].pos[2] = mouseWorld.z;
+				console.log(scene.children[6].geometry.bones[86].pos);
+			}*/
+		}
+
+		function testMouseControl() {
+			//while(inputkey != 2)
+			//{
+			if(eyeControl == 0)
+			{
+				console.log(eyeControl);
+				console.log(scene);
+		        scene.children[2].geometry.bones[86].pos[0] = mouseWorld.x;
+		        scene.children[2].geometry.bones[86].pos[1] = mouseWorld.y;
+		        scene.children[2].geometry.bones[86].pos[2] = mouseWorld.z;
+			    render();
+			}
+			else
+			{
+				console.log(eyeControl);
+				console.log(scene);
+		        scene.children[2].geometry.bones[88].pos[0] = mouseWorld.x;
+		        scene.children[2].geometry.bones[88].pos[1] = mouseWorld.y;
+		        scene.children[2].geometry.bones[88].pos[2] = mouseWorld.z;
+			    render();
+			}
+			
+			//} 
 		}
 
 		function animate() {
