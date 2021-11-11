@@ -91,6 +91,7 @@
 		let frustumSize0 = 2.5;
 		let frustumSize = 8;
 		let camera, camera2, camera3, camera4, camera5;
+		let eyeHeight, eyeWidth;
 
 		let eyeControl = 0;
 		let modelState = 1;
@@ -269,17 +270,10 @@
                 console.log('you click 2!');
 			    inputkey = 2;
 			}
-			if (event.keyCode == 51) {
-                console.log('you click 3!');
-			    inputkey = 3;
-			}
-			if (event.keyCode == 52) {
-                console.log('you click 4!');
-			    inputkey = 4;
-			}
 			if (event.keyCode == 81) {
                 console.log('you click Q!');
 			    inputkey = 81;
+				eyeHeightWidth();
 				if (eyeControl == 0) //eyeControl = 0表示目前控制模型的左眼
 				{
 					rightLines();
@@ -302,18 +296,15 @@
 			if (event.keyCode == 65) {
                 console.log('you click A!');
 			    inputkey = 65;
-                if(modelState == 0)
-				{
+                if(modelState == 0){
 					modelState = 2;
 					modelLoader();
 				}  
-				else if(modelState == 1)
-				{
+				else if(modelState == 1){
 					modelState = 0;
 					modelLoader();
 				}
-				else if(modelState == 2)
-				{
+				else if(modelState == 2){
 					modelState = 1;
 					modelLoader();
 				}  
@@ -321,18 +312,15 @@
 			if (event.keyCode == 68) {
                 console.log('you click D!');
 			    inputkey = 68;
-				if(modelState == 0)
-				{
+				if(modelState == 0){
                     modelState = 1;
 					modelLoader();
 				}    
-				else if(modelState == 1)
-				{
+				else if(modelState == 1){
                     modelState = 2;
 					modelLoader();
 				}     	    
-				else if(modelState == 2)
-				{
+				else if(modelState == 2){
                     modelState = 0;
 					modelLoader();
 				}	     	    
@@ -357,24 +345,21 @@
 
 			drawInitLine();
 
-			if(modelState == 0)
-			{
+			if(modelState == 0){
                 camera.position.y = 4;
 				camera2.position.y = 4;
 				camera3.position.y = 4;
 				camera4.position.y = 4;
 				camera5.position.y = 4;
 			}
-			else if(modelState == 1)
-			{
+			else if(modelState == 1){
 				camera.position.y = 8;
 				camera2.position.y = 8;
 				camera3.position.y = 8;
 				camera4.position.y = 8;
 				camera5.position.y = 8;
 			}
-			else if(modelState == 2)
-			{
+			else if(modelState == 2){
 				camera.position.y = 5;
 				camera2.position.y = 5;
 				camera3.position.y = 5;
@@ -423,46 +408,37 @@
 				linesInfro.location = dataset.location;
 
 				//console.log(linesInfro);
-
-				for(var i = 0; i < 4; i++)
-				{
-					switch(i) {
-						case 0:
-						    drawRed(linesInfro.line_locationx_1, linesInfro.line_locationy_1, i + 1);
-							break;
-						case 1:
-						    drawGreen(linesInfro.line_locationx_2, linesInfro.line_locationy_2, i + 1);
-							break;
-						case 2:
-						    drawRed(linesInfro.line_locationx_3, linesInfro.line_locationy_3, i + 1);
-							break;
-						case 3:
-						    drawGreen(linesInfro.line_locationx_4, linesInfro.line_locationy_4, i + 1);
-							break;
-					}
-				}
-				//drawRed(linesInfro.line_locationx_1, linesInfro.line_locationy_1);
-				//drawGreen(linesInfro.line_locationx_2, linesInfro.line_locationy_2);
-				//drawRed(linesInfro.line_locationx_3, linesInfro.line_locationy_3);
-				//drawGreen(linesInfro.line_locationx_4, linesInfro.line_locationy_4);
+				eyeHeightWidth();
+                leftLines();
 			}
 		}
 
 		function leftLines() {    //畫右邊的線條
             drawRed(linesInfro.line_locationx_1, linesInfro.line_locationy_1, 1);
 			drawRed(linesInfro.line_locationx_3, linesInfro.line_locationy_3, 3);
+
+			drawRed(linesInfro.line_locationx_1, linesInfro.line_locationy_1 - (eyeHeight * 0.25), 9);
+			drawRed(linesInfro.line_locationx_1, linesInfro.line_locationy_1 - (eyeHeight * 0.5), 10);
+			drawRed(linesInfro.line_locationx_1, linesInfro.line_locationy_1 - (eyeHeight * 0.75), 11);
+
 			drawGreen(linesInfro.line_locationx_2, linesInfro.line_locationy_2, 2);
 			drawGreen(linesInfro.line_locationx_4, linesInfro.line_locationy_4, 4);
-			if(modelState == 0)
-			{
+
+			drawGreen(linesInfro.line_locationx_2 - (eyeWidth * 0.125 * 1), linesInfro.line_locationy_2, 15);
+			drawGreen(linesInfro.line_locationx_2 - (eyeWidth * 0.125 * 2), linesInfro.line_locationy_2, 16);
+			drawGreen(linesInfro.line_locationx_2 - (eyeWidth * 0.125 * 3), linesInfro.line_locationy_2, 17);
+			drawGreen(linesInfro.line_locationx_2 - (eyeWidth * 0.125 * 4), linesInfro.line_locationy_2, 18);
+			drawGreen(linesInfro.line_locationx_2 - (eyeWidth * 0.125 * 5), linesInfro.line_locationy_2, 19);
+			drawGreen(linesInfro.line_locationx_2 - (eyeWidth * 0.125 * 6), linesInfro.line_locationy_2, 20);
+			drawGreen(linesInfro.line_locationx_2 - (eyeWidth * 0.125 * 7), linesInfro.line_locationy_2, 21);
+
+			if(modelState == 0){
                 camera.position.x = 0.75;
 			}
-			else if(modelState == 1)
-			{
+			else if(modelState == 1){
 				camera.position.x = 0.75;
 			}
-			else if(modelState == 2)
-			{
+			else if(modelState == 2){
 				camera.position.x = 0.75;
 			}
 		}
@@ -470,23 +446,42 @@
 		function rightLines() {    //畫左邊的線條
             drawRed(-(linesInfro.line_locationx_1), linesInfro.line_locationy_1, 5);
 			drawRed(-(linesInfro.line_locationx_3), linesInfro.line_locationy_3, 7);
+
+			drawRed(-(linesInfro.line_locationx_1), linesInfro.line_locationy_1 - (eyeHeight * 0.25), 12);
+			drawRed(-(linesInfro.line_locationx_1), linesInfro.line_locationy_1 - (eyeHeight * 0.5), 13);
+			drawRed(-(linesInfro.line_locationx_1), linesInfro.line_locationy_1 - (eyeHeight * 0.75), 14);
+
 			drawGreen(-(linesInfro.line_locationx_2), linesInfro.line_locationy_2, 6);
 			drawGreen(-(linesInfro.line_locationx_4), linesInfro.line_locationy_4, 8);
-			if(modelState == 0)
-			{
+
+			drawGreen(-(linesInfro.line_locationx_4 + (eyeWidth * 0.125 * 1)), linesInfro.line_locationy_2, 15);
+			drawGreen(-(linesInfro.line_locationx_4 + (eyeWidth * 0.125 * 2)), linesInfro.line_locationy_2, 16);
+			drawGreen(-(linesInfro.line_locationx_4 + (eyeWidth * 0.125 * 3)), linesInfro.line_locationy_2, 17);
+			drawGreen(-(linesInfro.line_locationx_4 + (eyeWidth * 0.125 * 4)), linesInfro.line_locationy_2, 18);
+			drawGreen(-(linesInfro.line_locationx_4 + (eyeWidth * 0.125 * 5)), linesInfro.line_locationy_2, 19);
+			drawGreen(-(linesInfro.line_locationx_4 + (eyeWidth * 0.125 * 6)), linesInfro.line_locationy_2, 20);
+			drawGreen(-(linesInfro.line_locationx_4 + (eyeWidth * 0.125 * 7)), linesInfro.line_locationy_2, 21);
+
+			if(modelState == 0){
                 camera.position.x = -0.75;
 			}
-			else if(modelState == 1)
-			{
+			else if(modelState == 1){
                 camera.position.x = -0.75;
 			}
-			else if(modelState == 2)
-			{
+			else if(modelState == 2){
 				camera.position.x = -0.75;
 			}
 		}
 
+		function eyeHeightWidth(){
+			eyeWidth = linesInfro.line_locationx_2 - linesInfro.line_locationx_4;
+			eyeHeight = linesInfro.line_locationy_1 - linesInfro.line_locationy_3;
+			console.log('eyeWidth = ' + eyeWidth);
+			console.log('eyeHeight = ' + eyeHeight);
+		}
+
 		function drawRed(line_locationx, line_locationy, num) {
+			console.log(line_locationy);
 			let material = new THREE.LineBasicMaterial( { color: 0xff0000 } );  //紅色
 			let points = [];
             points.push( new THREE.Vector3( line_locationx - 1, line_locationy, 20 ) );
@@ -505,16 +500,21 @@
 			    scene.remove( scene.getObjectByName("redLine3"));
 				console.log('3');
 			}
-			/*else if(num == 5){
-				line.name = "redLine5";
-			    scene.remove( scene.getObjectByName("redLine5"));
-				console.log('5');
+			else if(num == 9 || num == 12){
+				line.name = "redLine9";
+			    scene.remove( scene.getObjectByName("redLine9"));
+				console.log('9');
 			}
-			else if(num == 7){
-				line.name = "redLine7";
-			    scene.remove( scene.getObjectByName("redLine7"));
-				console.log('7');
-			}*/
+			else if(num == 10 || num == 13){
+				line.name = "redLine10";
+			    scene.remove( scene.getObjectByName("redLine10"));
+				console.log('10');
+			}
+			else if(num == 11 || num == 14){
+				line.name = "redLine11";
+			    scene.remove( scene.getObjectByName("redLine11"));
+				console.log('11');
+			}
 			
 			scene.add(line);
 		}
@@ -538,16 +538,41 @@
 			    scene.remove( scene.getObjectByName("greenLine4"));
 				console.log('4');
 			}
-			/*else if(num == 6){
-				line.name = "greenLine6";
-			    scene.remove( scene.getObjectByName("greenLine6"));
-				console.log('6');
+			else if(num == 15){
+				line.name = "greenLine15";
+			    scene.remove( scene.getObjectByName("greenLine15"));
+				console.log('15');
 			}
-			else if(num == 8){
-				line.name = "greenLine8";
-			    scene.remove( scene.getObjectByName("greenLine8"));
-				console.log('8');
-			}*/
+			else if(num == 16){
+				line.name = "greenLine16";
+			    scene.remove( scene.getObjectByName("greenLine16"));
+				console.log('16');
+			}
+			else if(num == 17){
+				line.name = "greenLine17";
+			    scene.remove( scene.getObjectByName("greenLine17"));
+				console.log('17');
+			}
+			else if(num == 18){
+				line.name = "greenLine18";
+			    scene.remove( scene.getObjectByName("greenLine18"));
+				console.log('18');
+			}
+			else if(num == 19){
+				line.name = "greenLine19";
+			    scene.remove( scene.getObjectByName("greenLine19"));
+				console.log('19');
+			}
+			else if(num == 20){
+				line.name = "greenLine20";
+			    scene.remove( scene.getObjectByName("greenLine20"));
+				console.log('20');
+			}
+			else if(num == 21){
+				line.name = "greenLine21";
+			    scene.remove( scene.getObjectByName("greenLine21"));
+				console.log('21');
+			}
 
 			scene.add(line);
 		}
@@ -559,50 +584,32 @@
                 -((e.clientY - top + 1) / height) * 2 + 1,
                 (camera.near + camera.far) / (camera.near - camera.far),
             );
-            //console.log(mouseWorld);  //在console內觀看結果
-			/*document.onclick = function () {  //點擊後
-                console.log('clicked!');
-				console.log(mouseWorld);
-				//console.log(scene.children[6]);
-				console.log(scene.children[6].geometry);
-				scene.children[6].geometry.bones[86].pos[0] = mouseWorld.x;
-				scene.children[6].geometry.bones[86].pos[1] = mouseWorld.y;
-				scene.children[6].geometry.bones[86].pos[2] = mouseWorld.z;
-				console.log(scene.children[6].geometry.bones[86].pos);
-			}*/
 		}
 
 		function testMouseControl() {
 			//左11 右13 -> 物述有栖
 			//左86 右88-> kizunaai
 			//左49 右51-> 天宮こころ
-			if(eyeControl == 0)
-			{
-				if(modelState == 0)
-				{
+			if(eyeControl == 0){
+				if(modelState == 0){
 					findMesh(11);
 				}
-				else if(modelState == 1)
-				{
+				else if(modelState == 1){
 					findMesh(86);
 				}
-				else if(modelState == 2)
-                {
+				else if(modelState == 2){
 					findMesh(49);
 				}
 			}
 			else
 			{
-				if(modelState == 0)
-				{
+				if(modelState == 0){
 					findMesh(13);
 				}
-				else if(modelState == 1)
-				{
+				else if(modelState == 1){
 					findMesh(88);
 				}
-				else if(modelState == 2)
-                {
+				else if(modelState == 2){
 					findMesh(51);
 				}
 			}
@@ -611,19 +618,27 @@
 		function findMesh(bonesNum) {
 			var i, correct;
 			console.log(eyeControl);
-			//console.log(scene);
+			console.log(mouseWorld);
 			for(i = 0; i < 7; i++)
 			{
 				if(scene.children[i].name == 'mesh')
 				{
 					correct = i;
-					scene.children[i].geometry.bones[bonesNum].pos[0] = mouseWorld.x;
-		            scene.children[i].geometry.bones[bonesNum].pos[1] = mouseWorld.y;
-		            scene.children[i].geometry.bones[bonesNum].pos[2] = mouseWorld.z;
-			        render();
+					//console.log()
+					//scene.children[i].skeleton.bones[bonesNum].rotation;
+					
+					//console.log(scene.children[i].skeleton.bones[bonesNum].rotation._x);
+					//let a = new THREE.Euler( -0.5, -0.5, -0.5, 'XYZ' );
+					//scene.children[i].skeleton.bones[bonesNum].rotation = a;
+					
+					scene.children[i].skeleton.bones[bonesNum].rotation._x = - 0.5;
+		            scene.children[i].skeleton.bones[bonesNum].rotation._y = - 0.5;
+		            //scene.children[i].skeleton.bones[bonesNum].rotation._z = - Math.PI * 0.5;
+					//animate();
+					
 				}
 			}
-			console.log(scene.children[correct].geometry.bones[bonesNum]);
+			console.log(scene.children[correct].skeleton.bones[bonesNum]);
 		}
 
 		function animate() {
