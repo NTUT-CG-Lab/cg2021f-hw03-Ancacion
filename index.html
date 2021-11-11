@@ -42,7 +42,7 @@
 			so.addChild("可按鍵選擇上 / 下一隻角色", 1, true);
 			so.addChild("讀取作業 2 儲存的座標點在眼睛上繪製出分割線", 1, true);
 			so.addChild("可選擇當下控制哪個虹膜", 1, true);
-			so.addChild("按滑鼠左鍵控制虹膜移動，右鍵停止", 2, false);
+			so.addChild("按滑鼠左鍵控制虹膜移動，右鍵停止", 2, true);
 			so.addChild("複製參數至對應目標參數", 2, false);
 			so.addChild("可儲存虹膜轉動角度", 1, false);
 
@@ -92,6 +92,7 @@
 		let frustumSize = 8;
 		let camera, camera2, camera3, camera4, camera5;
 		let eyeHeight, eyeWidth;
+		let temp, tempX, tempY;
 
 		let eyeControl = 0;
 		let modelState = 1;
@@ -126,7 +127,21 @@
 		});
 
 		var body = document.body;       
-		document.body.addEventListener('mousemove', getPosition, false);
+		//document.body.addEventListener('mousemove', getPosition, false);
+		document.onmousedown = function(events){
+            console.log('mouse click: ' + events.button);
+            switch(events.button){
+                case 0:
+                    body.addEventListener('mousemove', getPosition, false); //在body加上監聽(滑鼠移動時, 呼叫getPosition)  
+					//testMouseControl();            
+                    break;
+                case 2:
+                    body.removeEventListener('mousemove', getPosition, false); //在body加上監聽(滑鼠移動時, 呼叫getPosition)
+                    break;
+                default:
+                    console.log("not mouse");
+            }
+        }
 
 		function init() {
 
@@ -258,34 +273,38 @@
 		//
 
 		document.onkeydown = function(event) {
-			if (event.shiftKey) {
-                console.log('shift is clicked!');
-            }
 			if (event.keyCode == 49) {
                 console.log('you click 1!');
 			    inputkey = 1;
-				testMouseControl();
+				eyeControl = 0;
+				eyeHeightWidth();
+				//testMouseControl();
+				leftLines();
 			}
 			if (event.keyCode == 50) {
                 console.log('you click 2!');
 			    inputkey = 2;
+				eyeControl = 1;
+				eyeHeightWidth();
+				rightLines();
+				
 			}
 			if (event.keyCode == 81) {
                 console.log('you click Q!');
 			    inputkey = 81;
-				eyeHeightWidth();
+				/*eyeHeightWidth();
 				if (eyeControl == 0) //eyeControl = 0表示目前控制模型的左眼
 				{
 					rightLines();
 					eyeControl = 1;
 					console.log('eyeControl = ' + eyeControl);
 				}
-				else if (eyeControl == 1)
+				else if (eyeControl == 1) //eyeControl = 1表示目前控制模型的左眼
 				{
                     leftLines();
 					eyeControl = 0;
 					console.log('eyeControl = ' + eyeControl);
-				}
+				}*/
 			}
 			if (event.keyCode == 83) {
                 console.log('you click S!');
@@ -308,6 +327,7 @@
 					modelState = 1;
 					modelLoader();
 				}  
+				eyeControl = 0;
 			}
 			if (event.keyCode == 68) {
                 console.log('you click D!');
@@ -323,7 +343,8 @@
 				else if(modelState == 2){
                     modelState = 0;
 					modelLoader();
-				}	     	    
+				}	    
+				eyeControl = 0; 	    
 			}
 		}
 
@@ -584,6 +605,8 @@
                 -((e.clientY - top + 1) / height) * 2 + 1,
                 (camera.near + camera.far) / (camera.near - camera.far),
             );
+			//mouseWorld.unproject(camera);
+			testMouseControl();
 		}
 
 		function testMouseControl() {
@@ -618,27 +641,76 @@
 		function findMesh(bonesNum) {
 			var i, correct;
 			console.log(eyeControl);
-			console.log(mouseWorld);
-			for(i = 0; i < 7; i++)
+			for(i = 0; i < 17; i++)
 			{
 				if(scene.children[i].name == 'mesh')
 				{
 					correct = i;
-					//console.log()
-					//scene.children[i].skeleton.bones[bonesNum].rotation;
-					
-					//console.log(scene.children[i].skeleton.bones[bonesNum].rotation._x);
-					//let a = new THREE.Euler( -0.5, -0.5, -0.5, 'XYZ' );
-					//scene.children[i].skeleton.bones[bonesNum].rotation = a;
-					
-					scene.children[i].skeleton.bones[bonesNum].rotation._x = - 0.5;
-		            scene.children[i].skeleton.bones[bonesNum].rotation._y = - 0.5;
-		            //scene.children[i].skeleton.bones[bonesNum].rotation._z = - Math.PI * 0.5;
-					//animate();
-					
+					//console.log(mouseWorld.x + ', ' + mouseWorld.y);
+					if(eyeControl == 0) {  //左眼
+						if(tempY == null) {
+                            tempY = mouseWorld.y;
+							tempX = mouseWorld.x;
+						}
+                        else {
+                            temp = tempY - mouseWorld.y;
+                            scene.children[i].skeleton.bones[bonesNum].rotation.x += temp;
+							tempY = mouseWorld.y;
+
+							temp = tempX - mouseWorld.x;
+                            scene.children[i].skeleton.bones[bonesNum].rotation.y -= temp;
+							tempX = mouseWorld.x;
+						}
+						/*if(mouseWorld.y > ) {
+						    scene.children[i].skeleton.bones[bonesNum].rotation.x -= 0.01;
+					    }
+					    if(mouseWorld.y < ((linesInfro.line_locationy_1 + linesInfro.line_locationy_3) / 2)) {
+						    scene.children[i].skeleton.bones[bonesNum].rotation.x += 0.01;
+					    }*/
+					    /*if(mouseWorld.x > ((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2)) {
+						    scene.children[i].skeleton.bones[bonesNum].rotation.y += 0.01;
+					    }
+					    if(mouseWorld.x < ((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2)) {
+						    scene.children[i].skeleton.bones[bonesNum].rotation.y -= 0.01;
+					    }*/
+					}
+					else if(eyeControl == 1) {  //右眼
+						if(tempY == null) {
+                            tempY = mouseWorld.y;
+							tempX = mouseWorld.x;
+						}
+                        else {
+                            temp = tempY - mouseWorld.y;
+                            scene.children[i].skeleton.bones[bonesNum].rotation.x += temp;
+							tempY = mouseWorld.y;
+
+							temp = tempX - mouseWorld.x;
+                            scene.children[i].skeleton.bones[bonesNum].rotation.y -= temp;
+							tempX = mouseWorld.x;
+						}
+						//console.log((linesInfro.line_locationy_1 + linesInfro.line_locationy_3) / 2);
+						//console.log((-linesInfro.line_locationx_2 + -linesInfro.line_locationx_4) / 2);
+						/*if(mouseWorld.y > ((linesInfro.line_locationy_1 + linesInfro.line_locationy_3) / 2)) {
+						    scene.children[i].skeleton.bones[bonesNum].rotation.x -= 0.01;
+					    }
+					    if(mouseWorld.y < ((linesInfro.line_locationy_1 + linesInfro.line_locationy_3) / 2)) {
+						    scene.children[i].skeleton.bones[bonesNum].rotation.x += 0.01;
+					    }
+					    if(mouseWorld.x > -((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2) - 0.5) {
+							console.log('mouseWorld.x_1 = ' + mouseWorld.x);
+						    console.log(-((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2) - 0.5);
+						    scene.children[i].skeleton.bones[bonesNum].rotation.y += 0.01;
+					    }
+					    if(mouseWorld.x < -((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2) - 0.5) {
+							console.log('mouseWorld.x_2 = ' + mouseWorld.x);
+						    console.log(-((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2) - 0.5);
+						    scene.children[i].skeleton.bones[bonesNum].rotation.y -= 0.01;
+					    }*/
+					}					
 				}
 			}
-			console.log(scene.children[correct].skeleton.bones[bonesNum]);
+			//console.log('correct = ' + correct);
+			//console.log(scene.children[correct]);
 		}
 
 		function animate() {
