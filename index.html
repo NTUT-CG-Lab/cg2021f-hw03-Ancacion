@@ -338,6 +338,31 @@
             }, onProgress, null);
 
 			drawInitLine();
+
+			if(modelState == 0)
+			{
+                camera.position.y = 4;
+				camera2.position.y = 4;
+				camera3.position.y = 4;
+				camera4.position.y = 4;
+				camera5.position.y = 4;
+			}
+			else if(modelState == 1)
+			{
+				camera.position.y = 8;
+				camera2.position.y = 8;
+				camera3.position.y = 8;
+				camera4.position.y = 8;
+				camera5.position.y = 8;
+			}
+			else if(modelState == 2)
+			{
+				camera.position.y = 5;
+				camera2.position.y = 5;
+				camera3.position.y = 5;
+				camera4.position.y = 5;
+				camera5.position.y = 5;
+			}
 		}
 
 		function onProgress(xhr) {
