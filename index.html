@@ -573,28 +573,57 @@
 		}
 
 		function testMouseControl() {
-			//while(inputkey != 2)
-			//{
+			//左11 右13 -> 物述有栖
+			//左86 右88-> kizunaai
+			//左49 右51-> 天宮こころ
 			if(eyeControl == 0)
 			{
-				console.log(eyeControl);
-				console.log(scene);
-		        scene.children[2].geometry.bones[86].pos[0] = mouseWorld.x;
-		        scene.children[2].geometry.bones[86].pos[1] = mouseWorld.y;
-		        scene.children[2].geometry.bones[86].pos[2] = mouseWorld.z;
-			    render();
+				if(modelState == 0)
+				{
+					findMesh(11);
+				}
+				else if(modelState == 1)
+				{
+					findMesh(86);
+				}
+				else if(modelState == 2)
+                {
+					findMesh(49);
+				}
 			}
 			else
 			{
-				console.log(eyeControl);
-				console.log(scene);
-		        scene.children[2].geometry.bones[88].pos[0] = mouseWorld.x;
-		        scene.children[2].geometry.bones[88].pos[1] = mouseWorld.y;
-		        scene.children[2].geometry.bones[88].pos[2] = mouseWorld.z;
-			    render();
+				if(modelState == 0)
+				{
+					findMesh(13);
+				}
+				else if(modelState == 1)
+				{
+					findMesh(88);
+				}
+				else if(modelState == 2)
+                {
+					findMesh(51);
+				}
 			}
-			
-			//} 
+		}
+
+		function findMesh(bonesNum) {
+			var i, correct;
+			console.log(eyeControl);
+			//console.log(scene);
+			for(i = 0; i < 7; i++)
+			{
+				if(scene.children[i].name == 'mesh')
+				{
+					correct = i;
+					scene.children[i].geometry.bones[bonesNum].pos[0] = mouseWorld.x;
+		            scene.children[i].geometry.bones[bonesNum].pos[1] = mouseWorld.y;
+		            scene.children[i].geometry.bones[bonesNum].pos[2] = mouseWorld.z;
+			        render();
+				}
+			}
+			console.log(scene.children[correct].geometry.bones[bonesNum]);
 		}
 
 		function animate() {
