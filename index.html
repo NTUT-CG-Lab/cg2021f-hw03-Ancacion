@@ -44,7 +44,7 @@
 			so.addChild("可選擇當下控制哪個虹膜", 1, true);
 			so.addChild("按滑鼠左鍵控制虹膜移動，右鍵停止", 2, true);
 			so.addChild("複製參數至對應目標參數", 2, true);
-			so.addChild("可儲存虹膜轉動角度", 1, true);
+			so.addChild("可儲存虹膜轉動角度", 1, false);
 
 			//產生自評表，參數如下所示
 			so.renderModal(
@@ -93,8 +93,11 @@
 		let camera, camera2, camera3, camera4, camera5;
 		let eyeHeight, eyeWidth;
 		let temp, tempX, tempY, saveX, saveY;
+		let eyeMove = false;
 
-		let eyeControl = 0;
+		let eyeControlLeft = 1; //控制哪一個左眼
+		let eyeControlRight = 1; //控制哪一個右眼
+		//let eyeSelect = 1;
 		let modelState = 1;
 		let inputkey;
 		var dataUrl;
@@ -123,6 +126,12 @@
 		};
 		var recordX, recordY, recordXmax = 0, recordXmin = 0, recordYmax = 0, 
 		recordYmin = 0, recordXmid = 0, recordYmid = 0;
+		var camera2recordX, camera2recordY; //相機2的xy
+		var camera3recordX, camera3recordY; //相機3的xy
+		var camera4recordX, camera4recordY; //相機4的xy
+		var camera5recordX, camera5recordY; //相機5的xy
+		var cameraPointer = 2; //控制相機
+		var editWhere = 0; //目前在編輯左眼 = 0還是右眼 = 1
 
 		let modelFile = [
 			'models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx',
@@ -146,11 +155,16 @@
             console.log('mouse click: ' + events.button);
             switch(events.button){
                 case 0:
-                    body.addEventListener('mousemove', getPosition, false); //在body加上監聽(滑鼠移動時, 呼叫getPosition)  
+				    eyeMove = true; 
+                    body.addEventListener('mousemove', getPosition, false); //在body加上監聽(滑鼠移動時, 呼叫getPosition) 
 					//testMouseControl();            
                     break;
                 case 2:
                     body.removeEventListener('mousemove', getPosition, false); //在body加上監聽(滑鼠移動時, 呼叫getPosition)
+					writeRecord();
+					tempX = null;
+			        tempY = null;
+					eyeMove = false;
                     break;
                 default:
                     console.log("not mouse");
@@ -289,36 +303,46 @@
 		document.onkeydown = function(event) {
 			if (event.keyCode == 49) {
                 console.log('you click 1!');
-			    inputkey = 1;
-				eyeControl = 0;
+			    inputkey = 1; 
+				if(eyeControlLeft == 1) {
+					eyeControlLeft = 4; //1 = 2號相機, 以此類推
+				}
+				else {
+					eyeControlLeft -= 1;
+				} 
+				console.log('eyeControlLeft = ' + eyeControlLeft);
+				editWhere = 0;
 				eyeHeightWidth();
-				//testMouseControl();
 				leftLines();
 			}
 			if (event.keyCode == 50) {
                 console.log('you click 2!');
 			    inputkey = 2;
-				eyeControl = 1;
+				if(eyeControlRight == 4) {
+					eyeControlRight = 1;
+				}
+				else {
+					eyeControlRight += 1;
+				} 
+				console.log('eyeControlRight = ' + eyeControlRight);
+				editWhere = 1;
 				eyeHeightWidth();
 				rightLines();
-				
 			}
 			if (event.keyCode == 81) {
                 console.log('you click Q!');
 			    inputkey = 81;
 				eyeHeightWidth();
-				if (eyeControl == 0) //eyeControl = 0表示目前控制模型的左眼
+				if (editWhere == 0) //eyeWhere = 0表示目前控制模型的左眼
 				{
-					rightLines();
-					eyeControl = 1;
-					//console.log('eyeControl = ' + eyeControl);
+					//rightLines();
+					//editWhere = 1;
 					modelCopy();
 				}
-				else if (eyeControl == 1) //eyeControl = 1表示目前控制模型的左眼
+				else if (editWhere == 1) //eyeWhere = 1表示目前控制模型的右眼
 				{
-                    leftLines();
-					eyeControl = 0;
-					//console.log('eyeControl = ' + eyeControl);
+                    //leftLines();
+					//editWhere = 0;
 					modelCopy();
 				}
 			}
@@ -634,7 +658,7 @@
 			//左11 右13 -> 物述有栖
 			//左86 右88-> kizunaai
 			//左49 右51-> 天宮こころ
-			if(eyeControl == 0){
+			if(editWhere == 0){
 				if(modelState == 0){
 					findMesh(11);
 				}
@@ -667,74 +691,30 @@
 				if(scene.children[i].name == 'mesh')
 				{
 					correct = i;
-					if(eyeControl == 0 || eyeControl == 1) {  //左眼
-						if(tempY == null) {
-                            tempY = mouseWorld.y;
-							tempX = mouseWorld.x;
-						}
-                        else {
-                            temp = tempY - mouseWorld.y;
-                            scene.children[i].skeleton.bones[bonesNum].rotation.x += temp;
-							tempY = mouseWorld.y;
-
-							temp = tempX - mouseWorld.x;
-                            scene.children[i].skeleton.bones[bonesNum].rotation.y -= temp;
-							tempX = mouseWorld.x;
-						}
+					//if(eyeControlLeft == 0 || eyeControlLeft == 1 || eyeControlLeft == 2 || eyeControlLeft == 3 || 
+					//eyeControlRight == 0 || eyeControlRight == 1 || eyeControlRight == 2 || eyeControlRight == 3) {  //左眼右眼
+					if(tempY == null) {
+                        tempY = mouseWorld.y;
+						tempX = mouseWorld.x;
 					}
-					/*else if(eyeControl == 1) {  //右眼
-						if(tempY == null) {
-                            tempY = mouseWorld.y;
-							tempX = mouseWorld.x;
-						}
-                        else {
-                            temp = tempY - mouseWorld.y;
-                            scene.children[i].skeleton.bones[bonesNum].rotation.x += temp;
-							tempY = mouseWorld.y;
+                    else {
+                         temp = tempY - mouseWorld.y;
+                        scene.children[i].skeleton.bones[bonesNum].rotation.x += temp;
+						tempY = mouseWorld.y;
 
-							temp = tempX - mouseWorld.x;
-                            scene.children[i].skeleton.bones[bonesNum].rotation.y -= temp;
-							tempX = mouseWorld.x;
-						}
-				    }*/
+						temp = tempX - mouseWorld.x;
+                        scene.children[i].skeleton.bones[bonesNum].rotation.y -= temp;
+						tempX = mouseWorld.x;
+					}
+					//}
 					saveX = scene.children[i].skeleton.bones[bonesNum].rotation.x;
 					saveY = scene.children[i].skeleton.bones[bonesNum].rotation.y;	
 					///*
-					recordX = THREE.MathUtils.degToRad(saveX);
-					recordY = THREE.MathUtils.degToRad(saveY);
+					recordX = THREE.MathUtils.radToDeg(saveX);
+					recordY = THREE.MathUtils.radToDeg(saveY);
 					
-					if(recordX > recordXmax) {
-						recordXmax = recordX;
-					}
-					else if(recordX < recordXmin) {
-						recordXmin = recordX;
-					}
-					recordXmid = (recordXmin + recordXmax) / 2;
-
-					if(recordY > recordYmax) {
-						recordYmax = recordY;
-					}
-					else if(recordY < recordYmin) {
-						recordYmin = recordY;
-					}
-					recordYmid = (recordYmin + recordYmax) / 2;
-
-					console.log('recordX1Y1 = (' + recordXmid + ', ' + recordYmax + ')');
-					console.log('recordX2Y2 = (' + recordXmax + ', ' + recordYmid + ')');
-					console.log('recordX3Y3 = (' + recordXmid + ', ' + recordYmin + ')');
-					console.log('recordX4Y4 = (' + recordXmin + ', ' + recordYmid + ')');
-					//*/
-					//console.log('recordY = ' + recordY);
-					/*
-					Left_X_negative_angle
-                    Left_X_positive_angle
-                    Left_Y_negative_angle
-                    Left_Y_positive_angle
-					Right_X_negative_angle
-                    Right_X_positive_angle
-                    Right_Y_negative_angle
-                    Right_Y_positive_angle		
-					*/
+					console.log('recordX = ' + recordX);
+					console.log('recordY = ' + recordY);
 				}
 			}
 		}
@@ -743,7 +723,7 @@
 			//左11 右13 -> 物述有栖
 			//左86 右88-> kizunaai
 			//左49 右51-> 天宮こころ
-			if(eyeControl == 0){  //左眼
+			/*if(editWhere == 0){  //左眼
 				if(modelState == 0){
 					copyMesh(11);
 				}
@@ -754,8 +734,7 @@
 					copyMesh(49);	
 				}
 			}
-			else
-			{                   //右眼
+			else{               //右眼
 				if(modelState == 0){  
 					copyMesh(13);
 				}
@@ -765,6 +744,40 @@
 				else if(modelState == 2){
 					copyMesh(51);
 				}
+			}*/
+			//將左眼的角度存到分配給各相機
+			if(eyeControlLeft == 1 && editWhere == 0) { //2號相機左眼
+				//outputData.Left_X_negative_angle = camera2recordX;
+				outputData.Right_X_negative_angle = outputData.Left_X_negative_angle;
+			}
+			else if(eyeControlLeft == 2 && editWhere == 0) { //3號相機左眼
+				//outputData.Left_X_positive_angle = camera3recordX;
+				outputData.Right_X_positive_angle = outputData.Left_X_positive_angle;
+            }
+            else if(eyeControlLeft == 3 && editWhere == 0) { //4號相機左眼
+				//outputData.Left_Y_negative_angle = camera4recordY;
+				outputData.Right_Y_positive_angle = -outputData.Left_Y_negative_angle;
+			}
+			else if(eyeControlLeft == 4 && editWhere == 0) { //5號相機左眼
+				//outputData.Left_Y_positive_angle = camera5recordY;
+				outputData.Right_Y_negative_angle = -outputData.Left_Y_positive_angle;
+			}
+            //將右眼的角度存到分配給各相機
+			if(eyeControlRight == 1 && editWhere == 1) { //2號相機右眼
+				//outputData.Right_X_negative_angle = camera2recordX;
+				outputData.Left_X_negative_angle = outputData.Right_X_negative_angle;
+			}
+			else if(eyeControlRight == 2 && editWhere == 1) { //3號相機右眼
+				//outputData.Right_X_positive_angle = camera3recordX;
+				outputData.Left_X_positive_angle = outputData.Right_X_positive_angle;
+            }
+            else if(eyeControlRight == 3 && editWhere == 1) { //4號相機右眼
+				//outputData.Right_Y_negative_angle = camera4recordY;
+				outputData.Left_Y_positive_angle = -outputData.Right_Y_negative_angle;
+			}
+			else if(eyeControlRight == 4 && editWhere == 1) { //5號相機右眼
+				//outputData.Right_Y_positive_angle = camera5recordY;
+				outputData.Left_Y_negative_angle = -outputData.Right_Y_positive_angle;
 			}
 		}
 
@@ -777,11 +790,13 @@
 				{
 					correct = i;
 					//console.log(mouseWorld.x + ', ' + mouseWorld.y);
-					if(eyeControl == 0 || eyeControl == 1) {  //左眼
+					/*if(eyeControlLeft == 0 || eyeControlLeft == 1 || eyeControlLeft == 2 || eyeControlLeft == 3 || 
+					eyeControlRight == 0 || eyeControlRight == 1 || eyeControlRight == 2 || eyeControlRight == 3) {  //左眼
                         scene.children[i].skeleton.bones[bonesNum].rotation.x = saveX;
                         scene.children[i].skeleton.bones[bonesNum].rotation.y = saveY;
-					}					
+					}				*/	
 				}
+
 			}
 		}
 
@@ -827,38 +842,206 @@
 		}
 
 		function writeRecord() {
+			console.log('eyeControlLeft = ' + eyeControlLeft);
+			console.log('eyeControlRight = ' + eyeControlRight);
+			//將左眼的角度存到分配給各相機
+			if(eyeControlLeft == 1 && editWhere == 0) { //2號相機左眼
+				camera2recordX = recordX;
+				camera2recordY = recordY;
+				console.log('2recordX = ' + camera2recordX);
+				console.log('2recordY = ' + camera2recordY);
+				outputData.Left_X_negative_angle = camera2recordX;
+			}
+			else if(eyeControlLeft == 2 && editWhere == 0) { //3號相機左眼
+				camera3recordX = recordX;
+				camera3recordY = recordY;
+				console.log('3recordX = ' + camera3recordX);
+				console.log('3recordY = ' + camera3recordY);
+				outputData.Left_X_positive_angle = camera3recordX;
+            }
+            else if(eyeControlLeft == 3 && editWhere == 0) { //4號相機左眼
+				camera4recordX = recordX;
+				camera4recordY = recordY;
+				console.log('4recordX = ' + camera4recordX);
+				console.log('4recordY = ' + camera4recordY);
+				outputData.Left_Y_negative_angle = camera4recordY;
+			}
+			else if(eyeControlLeft == 4 && editWhere == 0) { //5號相機左眼
+				camera5recordX = recordX;
+				camera5recordY = recordY;
+				console.log('5recordX = ' + camera5recordX);
+				console.log('5recordY = ' + camera5recordY);
+				outputData.Left_Y_positive_angle = camera5recordY;
+			}
+            //將右眼的角度存到分配給各相機
+			if(eyeControlRight == 1 && editWhere == 1) { //2號相機右眼
+				camera2recordX = recordX;
+				camera2recordY = recordY;
+
+				outputData.Right_X_negative_angle = camera2recordX;
+			}
+			else if(eyeControlRight == 2 && editWhere == 1) { //3號相機右眼
+				camera3recordX = recordX;
+				camera3recordY = recordY;
+
+				outputData.Right_X_positive_angle = camera3recordX;
+            }
+            else if(eyeControlRight == 3 && editWhere == 1) { //4號相機右眼
+				camera4recordX = recordX;
+				camera4recordY = recordY;
+
+				outputData.Right_Y_negative_angle = camera4recordY;
+			}
+			else if(eyeControlRight == 4 && editWhere == 1) { //5號相機右眼
+				camera5recordX = recordX;
+				camera5recordY = recordY;
+
+				outputData.Right_Y_positive_angle = camera5recordY;
+			}
+
 			outputData.location = linesInfro.location;
-			outputData.Left_X_negative_angle = recordXmin;
+			/*outputData.Left_X_negative_angle = recordXmin;
             outputData.Left_X_positive_angle = recordXmax;
             outputData.Left_Y_negative_angle = recordYmin;
             outputData.Left_Y_positive_angle = recordYmid;
 			outputData.Right_X_negative_angle = recordXmin;
             outputData.Right_X_positive_angle = recordXmax;
             outputData.Right_Y_negative_angle = recordYmid;
-            outputData.Right_Y_positive_angle = recordYmax;
-			/*recordX = THREE.MathUtils.degToRad(saveX);
-			recordY = THREE.MathUtils.degToRad(saveY);
-					
-			if(recordX > recordXmax) {
-				recordXmax = recordX;
-			}
-			else if(recordX < recordXmin) {
-				recordXmin = recordX;
-			}
-			recordXmid = (recordXmin + recordXmax) / 2;
+            outputData.Right_Y_positive_angle = recordYmax;*/
+		}
 
-			if(recordY > recordYmax) {
-				recordYmax = recordY;
-			}
-			else if(recordY < recordYmin) {
-				recordYmin = recordY;
-			}
-			recordYmid = (recordYmin + recordYmax) / 2;
+		function drawEyeData(cameraName) {
+			if(eyeMove)
+			    return;
 
-			console.log('recordX1Y1 = (' + recordXmid + ', ' + recordYmax + ')');
-			console.log('recordX2Y2 = (' + recordXmax + ', ' + recordYmid + ')');
-			console.log('recordX3Y3 = (' + recordXmid + ', ' + recordYmin + ')');
-			console.log('recordX4Y4 = (' + recordXmin + ', ' + recordYmid + ')');*/
+			var i, correct;
+			//console.log(scene.children);
+			for(i = 0; i < 17; i++)
+			{
+				if(scene.children[i].name == 'mesh')
+				{
+					correct = i;
+				}
+			}
+
+            if(cameraName == 1) {
+				if(modelState == 0) {
+                    drawMainCamera(11, 13, correct);
+				}
+				else if(modelState == 1) {
+					drawMainCamera(86, 88, correct);
+				}
+				else if(modelState == 2) {
+					drawMainCamera(49, 51, correct);
+				}
+			}
+			else if(cameraName == 2) {
+                if(modelState == 0) {
+					drawCamera2(11, 13, correct);
+				}
+				else if(modelState == 1) {
+					drawCamera2(86, 88, correct);
+				}
+				else if(modelState == 2) {
+					drawCamera2(49, 51, correct);
+				}
+            }
+            else if(cameraName == 3) {
+				if(modelState == 0) {
+					drawCamera3(11, 13, correct);
+                }
+                else if(modelState == 1) {
+					drawCamera3(86, 88, correct);
+                }
+                else if(modelState == 2) {
+					drawCamera3(49, 51, correct);
+                 }
+			}
+			else if(cameraName == 4) {
+				if(modelState == 0) {
+					drawCamera4(11, 13, correct);
+                }
+                else if(modelState == 1) {
+					drawCamera4(86, 88, correct);
+                }
+                else if(modelState == 2) {
+					drawCamera4(49, 51, correct);
+                }
+            }
+            else if(cameraName == 5) {
+				if(modelState == 0) {
+					drawCamera5(11, 13, correct);
+                }
+                else if(modelState == 1) {
+					drawCamera5(86, 88, correct);
+                }
+                else if(modelState == 2) {
+					drawCamera5(49, 51, correct);
+                }
+            }
+		}
+
+		function drawMainCamera(Left, Right, correct) {
+			if(eyeControlLeft == 1 || eyeControlRight == 1) {
+				scene.children[correct].skeleton.bones[Left].rotation.x = THREE.MathUtils.degToRad(outputData.Left_X_negative_angle);
+                scene.children[correct].skeleton.bones[Left].rotation.y = 0;
+                scene.children[correct].skeleton.bones[Right].rotation.x = THREE.MathUtils.degToRad(outputData.Right_X_negative_angle);
+                scene.children[correct].skeleton.bones[Right].rotation.y = 0; 
+			}
+			if(eyeControlLeft == 2 || eyeControlRight == 2) {
+				scene.children[correct].skeleton.bones[Left].rotation.x = THREE.MathUtils.degToRad(outputData.Left_X_positive_angle);
+                scene.children[correct].skeleton.bones[Left].rotation.y = 0;
+                scene.children[correct].skeleton.bones[Right].rotation.x = THREE.MathUtils.degToRad(outputData.Right_X_positive_angle);
+                scene.children[correct].skeleton.bones[Right].rotation.y = 0; 
+			}
+			if(eyeControlLeft == 3 || eyeControlRight == 3) {
+				scene.children[correct].skeleton.bones[Left].rotation.x = 0;
+                scene.children[correct].skeleton.bones[Left].rotation.y = THREE.MathUtils.degToRad(outputData.Left_Y_negative_angle);
+                scene.children[correct].skeleton.bones[Right].rotation.x = 0;
+                scene.children[correct].skeleton.bones[Right].rotation.y = THREE.MathUtils.degToRad(outputData.Right_Y_negative_angle); 
+			}
+			if(eyeControlLeft == 4 || eyeControlRight == 4) {
+				scene.children[correct].skeleton.bones[Left].rotation.x = 0;
+                scene.children[correct].skeleton.bones[Left].rotation.y = THREE.MathUtils.degToRad(outputData.Left_Y_positive_angle);
+                scene.children[correct].skeleton.bones[Right].rotation.x = 0;
+                scene.children[correct].skeleton.bones[Right].rotation.y = THREE.MathUtils.degToRad(outputData.Right_Y_positive_angle); 
+			}
+		}
+
+		function drawCamera2(Left, Right, correct) {
+			//if(eyeControlLeft == 1 || eyeControlRight == 1) {
+			scene.children[correct].skeleton.bones[Left].rotation.x = THREE.MathUtils.degToRad(outputData.Left_X_negative_angle);
+            scene.children[correct].skeleton.bones[Left].rotation.y = 0;
+            scene.children[correct].skeleton.bones[Right].rotation.x = THREE.MathUtils.degToRad(outputData.Right_X_negative_angle);
+            scene.children[correct].skeleton.bones[Right].rotation.y = 0; 
+			//}
+		}
+
+		function drawCamera3(Left, Right, correct) {
+			//if(eyeControlLeft == 2 || eyeControlRight == 2) {
+			scene.children[correct].skeleton.bones[Left].rotation.x = THREE.MathUtils.degToRad(outputData.Left_X_positive_angle);
+            scene.children[correct].skeleton.bones[Left].rotation.y = 0;
+            scene.children[correct].skeleton.bones[Right].rotation.x = THREE.MathUtils.degToRad(outputData.Right_X_positive_angle);
+            scene.children[correct].skeleton.bones[Right].rotation.y = 0; 
+			//}
+		}
+
+		function drawCamera4(Left, Right, correct) {
+			//if(eyeControlLeft == 3 || eyeControlRight == 3) {
+			scene.children[correct].skeleton.bones[Left].rotation.x = 0;
+            scene.children[correct].skeleton.bones[Left].rotation.y = THREE.MathUtils.degToRad(outputData.Left_Y_negative_angle);
+            scene.children[correct].skeleton.bones[Right].rotation.x = 0;
+            scene.children[correct].skeleton.bones[Right].rotation.y = THREE.MathUtils.degToRad(outputData.Right_Y_negative_angle); 
+			//}
+		}
+
+		function drawCamera5(Left, Right, correct) {
+			//if(eyeControlLeft == 4 || eyeControlRight == 4) {
+			scene.children[correct].skeleton.bones[Left].rotation.x = 0;
+            scene.children[correct].skeleton.bones[Left].rotation.y = THREE.MathUtils.degToRad(outputData.Left_Y_positive_angle);
+            scene.children[correct].skeleton.bones[Right].rotation.x = 0;
+            scene.children[correct].skeleton.bones[Right].rotation.y = THREE.MathUtils.degToRad(outputData.Right_Y_positive_angle); 
+			//}
 		}
 
 		window.addEventListener('contextmenu', function (e) {
@@ -879,20 +1062,26 @@
 
 			effect.clear();
 
+			drawEyeData(1);
 			effect.setViewport(0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
 			effect.render(scene, camera);
 
+			drawEyeData(2);
 			effect.setViewport(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
 			effect.render(scene, camera2);
 
+			drawEyeData(3);
 			effect.setViewport(SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
 			effect.render(scene, camera3);
 
+			drawEyeData(4);
 			effect.setViewport(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
 			effect.render(scene, camera4);
 
+			drawEyeData(5);
 			effect.setViewport(SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2);
 			effect.render(scene, camera5);
+			drawEyeData(1);
 		}
 	</script>
 
