@@ -43,7 +43,7 @@
 			so.addChild("讀取作業 2 儲存的座標點在眼睛上繪製出分割線", 1, true);
 			so.addChild("可選擇當下控制哪個虹膜", 1, true);
 			so.addChild("按滑鼠左鍵控制虹膜移動，右鍵停止", 2, true);
-			so.addChild("複製參數至對應目標參數", 2, false);
+			so.addChild("複製參數至對應目標參數", 2, true);
 			so.addChild("可儲存虹膜轉動角度", 1, false);
 
 			//產生自評表，參數如下所示
@@ -92,7 +92,7 @@
 		let frustumSize = 8;
 		let camera, camera2, camera3, camera4, camera5;
 		let eyeHeight, eyeWidth;
-		let temp, tempX, tempY;
+		let temp, tempX, tempY, saveX, saveY;
 
 		let eyeControl = 0;
 		let modelState = 1;
@@ -110,6 +110,17 @@
             line_locationy_4:0
 		};  //把1234的線座標存起來
 		var mouseWorld = new THREE.Vector3();
+		var outputData = {
+			location:"",
+            Right_X_negative_angle:0,
+			Left_X_negative_angle:0,
+            Right_X_positive_angle:0,
+			Left_X_positive_angle:0,
+            Right_Y_negative_angle:0,
+			Left_Y_negative_angle:0,
+            Right_Y_positive_angle:0,
+			Left_Y_positive_angle:0
+		};
 
 		let modelFile = [
 			'models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx',
@@ -292,19 +303,21 @@
 			if (event.keyCode == 81) {
                 console.log('you click Q!');
 			    inputkey = 81;
-				/*eyeHeightWidth();
+				eyeHeightWidth();
 				if (eyeControl == 0) //eyeControl = 0表示目前控制模型的左眼
 				{
 					rightLines();
 					eyeControl = 1;
 					console.log('eyeControl = ' + eyeControl);
+					modelCopy();
 				}
 				else if (eyeControl == 1) //eyeControl = 1表示目前控制模型的左眼
 				{
                     leftLines();
 					eyeControl = 0;
 					console.log('eyeControl = ' + eyeControl);
-				}*/
+					modelCopy();
+				}
 			}
 			if (event.keyCode == 83) {
                 console.log('you click S!');
@@ -623,7 +636,7 @@
 					findMesh(86);
 				}
 				else if(modelState == 2){
-					findMesh(49);
+					findMesh(49);	
 				}
 			}
 			else
@@ -649,7 +662,7 @@
 				{
 					correct = i;
 					//console.log(mouseWorld.x + ', ' + mouseWorld.y);
-					if(eyeControl == 0) {  //左眼
+					if(eyeControl == 0 || eyeControl == 1) {  //左眼
 						if(tempY == null) {
                             tempY = mouseWorld.y;
 							tempX = mouseWorld.x;
@@ -663,20 +676,8 @@
                             scene.children[i].skeleton.bones[bonesNum].rotation.y -= temp;
 							tempX = mouseWorld.x;
 						}
-						/*if(mouseWorld.y > ) {
-						    scene.children[i].skeleton.bones[bonesNum].rotation.x -= 0.01;
-					    }
-					    if(mouseWorld.y < ((linesInfro.line_locationy_1 + linesInfro.line_locationy_3) / 2)) {
-						    scene.children[i].skeleton.bones[bonesNum].rotation.x += 0.01;
-					    }*/
-					    /*if(mouseWorld.x > ((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2)) {
-						    scene.children[i].skeleton.bones[bonesNum].rotation.y += 0.01;
-					    }
-					    if(mouseWorld.x < ((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2)) {
-						    scene.children[i].skeleton.bones[bonesNum].rotation.y -= 0.01;
-					    }*/
 					}
-					else if(eyeControl == 1) {  //右眼
+					/*else if(eyeControl == 1) {  //右眼
 						if(tempY == null) {
                             tempY = mouseWorld.y;
 							tempX = mouseWorld.x;
@@ -690,30 +691,77 @@
                             scene.children[i].skeleton.bones[bonesNum].rotation.y -= temp;
 							tempX = mouseWorld.x;
 						}
-						//console.log((linesInfro.line_locationy_1 + linesInfro.line_locationy_3) / 2);
-						//console.log((-linesInfro.line_locationx_2 + -linesInfro.line_locationx_4) / 2);
-						/*if(mouseWorld.y > ((linesInfro.line_locationy_1 + linesInfro.line_locationy_3) / 2)) {
-						    scene.children[i].skeleton.bones[bonesNum].rotation.x -= 0.01;
-					    }
-					    if(mouseWorld.y < ((linesInfro.line_locationy_1 + linesInfro.line_locationy_3) / 2)) {
-						    scene.children[i].skeleton.bones[bonesNum].rotation.x += 0.01;
-					    }
-					    if(mouseWorld.x > -((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2) - 0.5) {
-							console.log('mouseWorld.x_1 = ' + mouseWorld.x);
-						    console.log(-((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2) - 0.5);
-						    scene.children[i].skeleton.bones[bonesNum].rotation.y += 0.01;
-					    }
-					    if(mouseWorld.x < -((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2) - 0.5) {
-							console.log('mouseWorld.x_2 = ' + mouseWorld.x);
-						    console.log(-((linesInfro.line_locationx_2 + linesInfro.line_locationx_4) / 2) - 0.5);
-						    scene.children[i].skeleton.bones[bonesNum].rotation.y -= 0.01;
-					    }*/
-					}					
+				    }*/
+					saveX = scene.children[i].skeleton.bones[bonesNum].rotation.x;
+					saveY = scene.children[i].skeleton.bones[bonesNum].rotation.y;	
+					/*
+					Left_X_negative_angle
+                    Left_X_positive_angle
+                    Left_Y_negative_angle
+                    Left_Y_positive_angle
+					Right_X_negative_angle
+                    Right_X_positive_angle
+                    Right_Y_negative_angle
+                    Right_Y_positive_angle		
+					*/
 				}
 			}
 			//console.log('correct = ' + correct);
 			//console.log(scene.children[correct]);
 		}
+
+		function modelCopy() {
+			//左11 右13 -> 物述有栖
+			//左86 右88-> kizunaai
+			//左49 右51-> 天宮こころ
+			if(eyeControl == 0){  //左眼
+				if(modelState == 0){
+					copyMesh(11);
+				}
+				else if(modelState == 1){
+					copyMesh(86);
+				}
+				else if(modelState == 2){
+					copyMesh(49);	
+				}
+			}
+			else
+			{                   //右眼
+				if(modelState == 0){  
+					copyMesh(13);
+				}
+				else if(modelState == 1){
+					copyMesh(88);
+				}
+				else if(modelState == 2){
+					copyMesh(51);
+				}
+			}
+		}
+
+		function copyMesh(bonesNum) {
+			var i, correct;
+			console.log(eyeControl);
+			for(i = 0; i < 17; i++)
+			{
+				if(scene.children[i].name == 'mesh')
+				{
+					correct = i;
+					//console.log(mouseWorld.x + ', ' + mouseWorld.y);
+					if(eyeControl == 0 || eyeControl == 1) {  //左眼
+                        scene.children[i].skeleton.bones[bonesNum].rotation.x = saveX;
+                        scene.children[i].skeleton.bones[bonesNum].rotation.y = saveY;
+					}					
+				}
+			}
+		}
+
+		window.addEventListener('contextmenu', function (e) {
+            if (e.button == 2) {
+
+                e.preventDefault();
+            }
+        }, false);
 
 		function animate() {
 
