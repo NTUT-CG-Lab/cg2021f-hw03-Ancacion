@@ -44,7 +44,7 @@
 			so.addChild("可選擇當下控制哪個虹膜", 1, true);
 			so.addChild("按滑鼠左鍵控制虹膜移動，右鍵停止", 2, true);
 			so.addChild("複製參數至對應目標參數", 2, true);
-			so.addChild("可儲存虹膜轉動角度", 1, false);
+			so.addChild("可儲存虹膜轉動角度", 1, true);
 
 			//產生自評表，參數如下所示
 			so.renderModal(
@@ -121,6 +121,8 @@
             Right_Y_positive_angle:0,
 			Left_Y_positive_angle:0
 		};
+		var recordX, recordY, recordXmax = 0, recordXmin = 0, recordYmax = 0, 
+		recordYmin = 0, recordXmid = 0, recordYmid = 0;
 
 		let modelFile = [
 			'models/mmd/るいのれ式物述有栖_配布用フォルダ/物述有栖.pmx',
@@ -133,6 +135,7 @@
 			Ammo = AmmoLib;
 
 			init();
+			initRecord();
 			animate();
 
 		});
@@ -308,22 +311,24 @@
 				{
 					rightLines();
 					eyeControl = 1;
-					console.log('eyeControl = ' + eyeControl);
+					//console.log('eyeControl = ' + eyeControl);
 					modelCopy();
 				}
 				else if (eyeControl == 1) //eyeControl = 1表示目前控制模型的左眼
 				{
                     leftLines();
 					eyeControl = 0;
-					console.log('eyeControl = ' + eyeControl);
+					//console.log('eyeControl = ' + eyeControl);
 					modelCopy();
 				}
 			}
 			if (event.keyCode == 83) {
                 console.log('you click S!');
 			    inputkey = 83;
-				//console.log(linesInfro);
-                //openJSONFile();
+				console.log(outputData);
+				//var record = THREE.MathUtils.degToRad();
+				writeRecord();
+                openJSONFile();
 			}
 			if (event.keyCode == 65) {
                 console.log('you click A!');
@@ -380,6 +385,7 @@
 			tempX = null;
 			tempY = null;
 			drawInitLine();
+			initRecord();
 
 			if(modelState == 0){
                 camera.position.y = 4;
@@ -432,7 +438,7 @@
   			    var dataset = JSON.parse(this.responseText);
     		    //console.log(dataset);
 
-		        console.log(dataset.line_locationx_1);
+		        //console.log(dataset.line_locationx_1);
 				linesInfro.line_locationx_1 = dataset.line_locationx_1;
 				linesInfro.line_locationy_1 = dataset.line_locationy_1;
 				linesInfro.line_locationx_2 = dataset.line_locationx_2;
@@ -512,12 +518,12 @@
 		function eyeHeightWidth(){
 			eyeWidth = linesInfro.line_locationx_2 - linesInfro.line_locationx_4;
 			eyeHeight = linesInfro.line_locationy_1 - linesInfro.line_locationy_3;
-			console.log('eyeWidth = ' + eyeWidth);
-			console.log('eyeHeight = ' + eyeHeight);
+			//console.log('eyeWidth = ' + eyeWidth);
+			//console.log('eyeHeight = ' + eyeHeight);
 		}
 
 		function drawRed(line_locationx, line_locationy, num) {
-			console.log(line_locationy);
+			//console.log(line_locationy);
 			let material = new THREE.LineBasicMaterial( { color: 0xff0000 } );  //紅色
 			let points = [];
             points.push( new THREE.Vector3( line_locationx - 1, line_locationy, 20 ) );
@@ -529,27 +535,27 @@
 			if(num == 1 || num == 5) {
 				line.name = "redLine1";
 			    scene.remove( scene.getObjectByName("redLine1"));
-				console.log('1');
+				//console.log('1');
 			}
 			else if(num == 3 || num == 7){
 				line.name = "redLine3";
 			    scene.remove( scene.getObjectByName("redLine3"));
-				console.log('3');
+				//console.log('3');
 			}
 			else if(num == 9 || num == 12){
 				line.name = "redLine9";
 			    scene.remove( scene.getObjectByName("redLine9"));
-				console.log('9');
+				//console.log('9');
 			}
 			else if(num == 10 || num == 13){
 				line.name = "redLine10";
 			    scene.remove( scene.getObjectByName("redLine10"));
-				console.log('10');
+				//console.log('10');
 			}
 			else if(num == 11 || num == 14){
 				line.name = "redLine11";
 			    scene.remove( scene.getObjectByName("redLine11"));
-				console.log('11');
+				//console.log('11');
 			}
 			
 			scene.add(line);
@@ -567,47 +573,47 @@
 			if(num == 2 || num == 6) {
 				line.name = "greenLine2";
 			    scene.remove( scene.getObjectByName("greenLine2"));
-				console.log('2');
+				//console.log('2');
 			}
 			else if(num == 4 || num == 8){
 				line.name = "greenLine4";
 			    scene.remove( scene.getObjectByName("greenLine4"));
-				console.log('4');
+				//console.log('4');
 			}
 			else if(num == 15){
 				line.name = "greenLine15";
 			    scene.remove( scene.getObjectByName("greenLine15"));
-				console.log('15');
+				//console.log('15');
 			}
 			else if(num == 16){
 				line.name = "greenLine16";
 			    scene.remove( scene.getObjectByName("greenLine16"));
-				console.log('16');
+				//console.log('16');
 			}
 			else if(num == 17){
 				line.name = "greenLine17";
 			    scene.remove( scene.getObjectByName("greenLine17"));
-				console.log('17');
+				//console.log('17');
 			}
 			else if(num == 18){
 				line.name = "greenLine18";
 			    scene.remove( scene.getObjectByName("greenLine18"));
-				console.log('18');
+				//console.log('18');
 			}
 			else if(num == 19){
 				line.name = "greenLine19";
 			    scene.remove( scene.getObjectByName("greenLine19"));
-				console.log('19');
+				//console.log('19');
 			}
 			else if(num == 20){
 				line.name = "greenLine20";
 			    scene.remove( scene.getObjectByName("greenLine20"));
-				console.log('20');
+				//console.log('20');
 			}
 			else if(num == 21){
 				line.name = "greenLine21";
 			    scene.remove( scene.getObjectByName("greenLine21"));
-				console.log('21');
+				//console.log('21');
 			}
 
 			scene.add(line);
@@ -655,13 +661,12 @@
 
 		function findMesh(bonesNum) {
 			var i, correct;
-			console.log(eyeControl);
+			//console.log(eyeControl);
 			for(i = 0; i < 17; i++)
 			{
 				if(scene.children[i].name == 'mesh')
 				{
 					correct = i;
-					//console.log(mouseWorld.x + ', ' + mouseWorld.y);
 					if(eyeControl == 0 || eyeControl == 1) {  //左眼
 						if(tempY == null) {
                             tempY = mouseWorld.y;
@@ -694,6 +699,32 @@
 				    }*/
 					saveX = scene.children[i].skeleton.bones[bonesNum].rotation.x;
 					saveY = scene.children[i].skeleton.bones[bonesNum].rotation.y;	
+					///*
+					recordX = THREE.MathUtils.degToRad(saveX);
+					recordY = THREE.MathUtils.degToRad(saveY);
+					
+					if(recordX > recordXmax) {
+						recordXmax = recordX;
+					}
+					else if(recordX < recordXmin) {
+						recordXmin = recordX;
+					}
+					recordXmid = (recordXmin + recordXmax) / 2;
+
+					if(recordY > recordYmax) {
+						recordYmax = recordY;
+					}
+					else if(recordY < recordYmin) {
+						recordYmin = recordY;
+					}
+					recordYmid = (recordYmin + recordYmax) / 2;
+
+					console.log('recordX1Y1 = (' + recordXmid + ', ' + recordYmax + ')');
+					console.log('recordX2Y2 = (' + recordXmax + ', ' + recordYmid + ')');
+					console.log('recordX3Y3 = (' + recordXmid + ', ' + recordYmin + ')');
+					console.log('recordX4Y4 = (' + recordXmin + ', ' + recordYmid + ')');
+					//*/
+					//console.log('recordY = ' + recordY);
 					/*
 					Left_X_negative_angle
                     Left_X_positive_angle
@@ -706,8 +737,6 @@
 					*/
 				}
 			}
-			//console.log('correct = ' + correct);
-			//console.log(scene.children[correct]);
 		}
 
 		function modelCopy() {
@@ -741,7 +770,7 @@
 
 		function copyMesh(bonesNum) {
 			var i, correct;
-			console.log(eyeControl);
+			//console.log(eyeControl);
 			for(i = 0; i < 17; i++)
 			{
 				if(scene.children[i].name == 'mesh')
@@ -754,6 +783,81 @@
 					}					
 				}
 			}
+		}
+
+		function openJSONFile() {
+            var data = JSON.stringify(outputData);
+            var outputFile;
+			if(modelState == 0) {
+                outputFile = "物述有栖_modelData_result.json";
+			}
+			else if(modelState == 1) {
+				outputFile = "kizunaai_modelData_result.json";
+			}
+			else if(modelState == 2){
+				outputFile = "天宮こころ_modelData_result.json";
+			}
+			console.log(outputFile);
+
+			var file = new Blob([data], {type: "application/json"});
+			if (window.navigator.msSaveOrOpenBlob) // work on IE10+
+                window.navigator.msSaveOrOpenBlob(file, outputFile);
+            else { // Others like google chrome
+				console.log("ping!");
+                var a = document.createElement("a"),
+                        url = URL.createObjectURL(file);
+                a.href = url;
+                a.download = outputFile;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(function() {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);  
+                }, 0); 
+            }
+		}
+
+		function initRecord() {
+			recordXmax = 0;
+			recordXmin = 0; 
+			recordYmax = 0; 
+		    recordYmin = 0;
+			recordXmid = 0; 
+			recordYmid = 0;
+		}
+
+		function writeRecord() {
+			outputData.Left_X_negative_angle = recordXmin;
+            outputData.Left_X_positive_angle = recordXmax;
+            outputData.Left_Y_negative_angle = recordYmin;
+            outputData.Left_Y_positive_angle = recordYmid;
+			outputData.Right_X_negative_angle = recordXmin;
+            outputData.Right_X_positive_angle = recordXmax;
+            outputData.Right_Y_negative_angle = recordYmid;
+            outputData.Right_Y_positive_angle = recordYmax;
+			/*recordX = THREE.MathUtils.degToRad(saveX);
+			recordY = THREE.MathUtils.degToRad(saveY);
+					
+			if(recordX > recordXmax) {
+				recordXmax = recordX;
+			}
+			else if(recordX < recordXmin) {
+				recordXmin = recordX;
+			}
+			recordXmid = (recordXmin + recordXmax) / 2;
+
+			if(recordY > recordYmax) {
+				recordYmax = recordY;
+			}
+			else if(recordY < recordYmin) {
+				recordYmin = recordY;
+			}
+			recordYmid = (recordYmin + recordYmax) / 2;
+
+			console.log('recordX1Y1 = (' + recordXmid + ', ' + recordYmax + ')');
+			console.log('recordX2Y2 = (' + recordXmax + ', ' + recordYmid + ')');
+			console.log('recordX3Y3 = (' + recordXmid + ', ' + recordYmin + ')');
+			console.log('recordX4Y4 = (' + recordXmin + ', ' + recordYmid + ')');*/
 		}
 
 		window.addEventListener('contextmenu', function (e) {
